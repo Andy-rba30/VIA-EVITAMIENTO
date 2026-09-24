@@ -161,14 +161,56 @@ que no se puede hacer con *Create Intersection*, sólo con corredor manual, lín
 * Añadir la extensión del corredor como contorno exterior de la superficie de intersección (hoy tiene 0 caras) y volver a
   correr la comprobación de visibilidad.
 
-## 5. Figuras
+### 4.5 Compatibilidad de la nueva curva con el trazo existente
+
+* Todo lo anterior al ST de la última curva actual (4+030.53) queda intacto: las cuatro curvas con espirales, sus peraltes
+  (la última transición termina en 4+007.98) y el perfil hasta 4+055.6.
+* La nueva curva gira a la izquierda y la anterior a la derecha, así que forman una "S". El DG-2018 (Tabla 302.01) pide una
+  tangente mínima entre curvas en S de 1.39·V = 111.2 m a 80 km/h. Con R = 550 m y Le = 75 m la tangente es de 112.1 m
+  (4+030.53 a 4+142.60): cumple, con poco margen. Entre el fin del peralte anterior (4+007.98) y el inicio de la nueva
+  transición (≈ 4+165) quedan 157 m de bombeo normal.
+* Si se quiere más margen o mover la T más al norte, basta con bajar el radio de la nueva curva (todos cumplen R mín = 229 m
+  para 80 km/h):
+
+| R (m) | T (m) | TS en el eje | tangente desde 4+030.53 | ST sobre 1NK_I1 | longitud total de curva |
+|---|---|---|---|---|---|
+| 550 | 133.0 | 4+142.60 | 112.1 m | 0+051.98 | 264.0 m |
+| 500 | 124.3 | 4+151.27 | 120.7 m | 0+060.65 | 246.8 m |
+| 450 | 115.7 | 4+159.94 | 129.4 m | 0+069.32 | 229.6 m |
+| 400 | 107.0 | 4+168.61 | 138.1 m | 0+077.99 | 212.5 m |
+
+* En perfil, el PVI de 4+141.81 (18.545 m, L = 172.39 m) se conserva; solo cambia su pendiente de salida. Propuesta inicial:
+  PVI 4+380.00 a 20.373 m (+0.767 %) y fin en 4+458.58 a 21.037 m (+0.845 %, la pendiente con la que 1NK_I1 llega a su
+  0+000). En 4+141.81 el cambio de pendiente pasa a 0.90 % y con L = 172.39 m resulta K = 192, muy por encima del mínimo.
+  Ojo: entre 1NK_I1 0+031 y 0+078 la vía existente baja al −6.25 %; la nueva rasante queda ≈ 1 m por encima de la vía
+  existente en 0+052, así que ese tramo de 1NK_I1 se reconstruye y el empalme definitivo debe verificarse con el
+  levantamiento de la vía más allá de 0+000.
+* Ramal: perfil 0+000 = rasante del eje en 4+100 (≈ 17.80 m con la rasante modificada), 0+108.3 a 20.01 m (cresta, L = 30 m)
+  y 0+183.3 a 19.16 m; pendientes +2.0 % y −1.1 %.
+
+### 4.6 Por qué los ensamblajes propios "empeoraban" la intersección
+
+El asistente no mira las características de la sección (anchos, espesores) sino el tipo de subensamblaje y sus destinos:
+los carriles de sus ensamblajes por defecto son `LaneSuperelevationAOR` con destino de anchura hacia las alineaciones de
+desfase y, en los cuadrantes, hacia el eje de la vía principal; además usa un juego de siete ensamblajes (completo, parcial
+con talud a un lado, media sección, cuadrante) para que cada región tenga talud solo hacia afuera. Al poner un ensamblaje
+"completo" propio en todas las regiones, los carriles no se estiran hasta la vía principal, los taludes y el bordillo
+aparecen dentro del área de la intersección y las regiones se cruzan. Y con 19.7° ningún ensamblaje iba a verse bien.
+El archivo `prompt-agente-local.md` incluye cómo derivar el juego rural a partir del ensamblaje propio.
+
+## 5. Prompt para el agente local
+
+`prompt-agente-local.md` contiene, fase por fase y con puntos de control, los pasos para ejecutar esta corrección en
+Civil 3D (limpieza, prolongación del eje, ramal, perfiles, ensamblajes, intersección en T, corredor y comprobaciones).
+
+## 6. Figuras
 
 * `fig_int3_planta.png`: planta reconstruida desde el LandXML (links de sección de cada región, alineamientos, TIN de la
   superficie `Rasante`, puntos de `Interseccion_3`, curvas de nivel) con los problemas anotados.
 * `fig_int3_general.png`: vista general de los últimos 300 m del eje y de 1NK_I1.
 * `fig_int3_propuesta.png`: esquema conceptual "Y → vía continua + T a 90°".
 
-## 6. Cómo se hizo (reproducible)
+## 7. Cómo se hizo (reproducible)
 
 Scripts en `scripts/` (Python 3 con `lxml`, `numpy`, `matplotlib`). El LandXML está en Git LFS; hay que descargarlo primero.
 
